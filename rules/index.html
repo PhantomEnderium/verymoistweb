@@ -40,5 +40,23 @@
   <p style="margin-top: 40px;">
     <a href="../">Return to Homepage</a>
   </p>
+
+  <p id="output"></p>
+
+  <script>
+    fetch("https://pastebin.com/raw/HGBLcuBY")
+    .then(res => res.text())
+    .then(text => {
+      document.getElementById("output").innerHTML = convertUnityRichText();
+    });
+
+    function convertUnityRichText(input) {
+      return input
+    .replace(/<b>(.*?)<\/b>/g, "<strong>$1</strong>")
+    .replace(/<i>(.*?)<\/i>/g, "<em>$1</em>")
+    .replace(/<size=(\d+)>(.*?)<\/size>/g, '<span style="font-size:$1px">$2</span>')
+    .replace(/<color=(.*?)>(.*?)<\/color>/g, '<span style="color:$1">$2</span>');
+    }
+  </script>
 </body>
 </html>
