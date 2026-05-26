@@ -7,41 +7,10 @@
   <link rel="stylesheet" href="../style.css">
 </head>
 <body>
-  <h1>WELCOME TO THE VERY MOIST PLAYGROUND, WE GET MOIST IN HERE!</h1>
-  
-  <p>Please read our rules before proceeding within the server and join our discord!</p>
-  
-  <p>
-    <a href="https://discord.gg/4K5VvBwJck"><u>Discord</u> ~ <u>(clickable)</u></a>
-  </p>
-  <p>
-    <a href="https://tvmp.cmod.app"><u>Player List, Ban Appeals, etc.</u> ~ <u>(clickable)</u></a>
-  </p>
-  
-  <p style="color: #ff5555;">
-    <i>Minimum age to play is <b>13 years old</b>. This is due to TOS. Joining underage will result in a ban!</i>
-  </p>
-  
-  <h2>Server Rules</h2>
-  <ul style="text-align: left; display: inline-block; margin: 20px auto; list-style: none;">
-    <li>[ 1 ] ► Abide by the SCP:SL Terms of Service.</li>
-    <li>[ 2 ] ► No excessive mic spamming. The occasional soundboard? Go for it.</li>
-    <li>[ 3 ] ► Leaving the game after becomes 049-2 is strictly against the rules</li>
-    <li>[ 4 ] ► Listen to the Staff team.</li>
-    <li>[ 5 ] ► Be respectful to all players staff.</li>
-    <li>[ 6 ] ► No advertising other servers. You CAN advertise our Discord server though ;)</li>
-    <li>[ 7 ] ► No begging for roles or staff. Applications (when available) can be found on Discord.</li>
-    <li>[ 8 ] ► DDOS and Doxing threats are unacceptable and will be met with a permanent ban.</li>
-    <li>[ 9 ] ► Harassment against other members is not acceptable. Sexism, Racism, etc. will NOT be tolerated!</li>
-    <li>[ 10 ] ► Impersonation of any kind is prohibited. You are not "very moist", that is moist's job.</li>
-    <li>[ 11 ] ► This list is non-exhaustive. Use common sense; staff may punish you for things not explicitly listed here.</li>
-    <li>[ 12 ] ► Most importantly, have fun! :)</li>
-  </ul>
+  <p id="output"></p>
   <p style="margin-top: 40px;">
     <a href="../">Return to Homepage</a>
   </p>
-
-  <p id="output"></p>
 
   <script>
     fetch("https://shadowloafs.xyz/api/tvmpDesc")
@@ -50,13 +19,47 @@
     document.getElementById("output").innerHTML = convertUnityRichText(text);
     });
 
-    function convertUnityRichText(input) {
-      return input
+function renderUnityText(rawText) {
+  return rawText
+    .split("\n") // preserve Unity-style line structure
+    .map(line => convertUnityRichText(line))
+    .map(line => `<div class="unity-line">${line}</div>`)
+    .join("");
+}
+
+
+// Core tag converter (Unity → HTML)
+function convertUnityRichText(input) {
+  return input
+
+    // ALIGNMENT (block-like behavior inside line)
+    .replace(/<align="?center"?>(.*?)<\/align>/g,
+      '<div style="text-align:center">$1</div>')
+    .replace(/<align="?left"?>(.*?)<\/align>/g,
+      '<div style="text-align:left">$1</div>')
+    .replace(/<align="?right"?>(.*?)<\/align>/g,
+      '<div style="text-align:right">$1</div>')
+
+    // BASIC FORMATTING
     .replace(/<b>(.*?)<\/b>/g, "<strong>$1</strong>")
     .replace(/<i>(.*?)<\/i>/g, "<em>$1</em>")
-    .replace(/<size=(\d+)>(.*?)<\/size>/g, '<span style="font-size:$1px">$2</span>')
-    .replace(/<color=(.*?)>(.*?)<\/color>/g, '<span style="color:$1">$2</span>');
-    }
+    .replace(/<u>(.*?)<\/u>/g, "<u>$1</u>")
+
+    // SIZE
+    .replace(/<size=(\d+)>(.*?)<\/size>/g,
+      '<span style="font-size:$1px">$2</span>')
+
+    // COLOR
+    .replace(/<color=(.*?)>(.*?)<\/color>/g,
+      '<span style="color:$1">$2</span>')
+
+    // LINKS (Unity-style → HTML anchor)
+    .replace(/<link="(.*?)">(.*?)<\/link>/g,
+      '<a href="$1" target="_blank" rel="noopener noreferrer">$2</a>')
+
+    // Remove raw newlines inside converted lines
+    .replace(/\n/g, "");
+}
   </script>
 </body>
 </html>
