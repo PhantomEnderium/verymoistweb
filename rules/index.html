@@ -44,10 +44,10 @@
   <p id="output"></p>
 
   <script>
-    fetch("https://pastebin.com/raw/HGBLcuBY")
-    .then(res => res.text())
+    fetch("https://shadowloafs.xyz/api/tvmpDesc")
+    .then(r => r.text())
     .then(text => {
-      document.getElementById("output").innerHTML = convertUnityRichText();
+    document.getElementById("output").innerHTML = convertUnityRichText(text);
     });
 
     function convertUnityRichText(input) {
