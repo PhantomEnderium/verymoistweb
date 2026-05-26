@@ -21,18 +21,18 @@
 
 function renderUnityText(rawText) {
   return rawText
-    .split("\n") // preserve Unity-style line structure
+    .split("\n") // block separation
     .map(line => convertUnityRichText(line))
     .map(line => `<div class="unity-line">${line}</div>`)
     .join("");
 }
 
 
-// Core tag converter (Unity → HTML)
+// Converts Unity tags but preserves internal structure
 function convertUnityRichText(input) {
   return input
 
-    // ALIGNMENT (block-like behavior inside line)
+    // ALIGNMENT
     .replace(/<align="?center"?>(.*?)<\/align>/g,
       '<div style="text-align:center">$1</div>')
     .replace(/<align="?left"?>(.*?)<\/align>/g,
@@ -40,7 +40,7 @@ function convertUnityRichText(input) {
     .replace(/<align="?right"?>(.*?)<\/align>/g,
       '<div style="text-align:right">$1</div>')
 
-    // BASIC FORMATTING
+    // FORMATTING
     .replace(/<b>(.*?)<\/b>/g, "<strong>$1</strong>")
     .replace(/<i>(.*?)<\/i>/g, "<em>$1</em>")
     .replace(/<u>(.*?)<\/u>/g, "<u>$1</u>")
@@ -53,12 +53,13 @@ function convertUnityRichText(input) {
     .replace(/<color=(.*?)>(.*?)<\/color>/g,
       '<span style="color:$1">$2</span>')
 
-    // LINKS (Unity-style → HTML anchor)
+    // LINKS
     .replace(/<link="(.*?)">(.*?)<\/link>/g,
       '<a href="$1" target="_blank" rel="noopener noreferrer">$2</a>')
 
-    // Remove raw newlines inside converted lines
-    .replace(/\n/g, "");
+    // IMPORTANT FIX:
+    // preserve internal line breaks instead of deleting them
+    .replace(/\n/g, "<br>");
 }
   </script>
 </body>
