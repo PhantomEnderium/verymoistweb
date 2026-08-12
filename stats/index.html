@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Very Moist Playground - SCP:SL Server Stats</title>
+
+
+<style>
+    body {
+        font-family: system-ui, sans-serif;
+        max-width: 900px;
+        margin: 40px auto;
+        padding: 0 20px;
+        background: #111;
+        color: #eee;
+    }
+
+    h1 {
+        margin-bottom: 30px;
+    }
+
+    .stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 15px;
+    }
+
+    .card {
+        background: #1d1d1d;
+        border: 1px solid #333;
+        border-radius: 8px;
+        padding: 20px;
+    }
+
+    .label {
+        color: #999;
+        font-size: 14px;
+        margin-bottom: 8px;
+    }
+
+    .value {
+        font-size: 28px;
+        font-weight: bold;
+    }
+
+    #status {
+        margin-bottom: 20px;
+    }
+
+    .online {
+        color: #4ade80;
+    }
+
+    .offline {
+        color: #f87171;
+    }
+
+    .warning {
+        color: #facc15;
+    }
+
+    pre {
+        margin-top: 30px;
+        padding: 20px;
+        background: #1d1d1d;
+        border: 1px solid #333;
+        border-radius: 8px;
+        overflow-x: auto;
+    }
+</style>
+
+
+</head>
+
+<body>
+
+
+<h1>The Very Moist Playground - SCP:SL Server Stats</h1>
+
+<div id="status">Loading...</div>
+
+<div class="stats">
+
+    <div class="card">
+        <div class="label">Server ID</div>
+        <div class="value" id="serverId">—</div>
+    </div>
+
+    <div class="card">
+        <div class="label">Port</div>
+        <div class="value" id="port">—</div>
+    </div>
+
+    <div class="card">
+        <div class="label">Players</div>
+        <div class="value" id="players">—</div>
+    </div>
+
+    <div class="card">
+        <div class="label">Last Updated</div>
+        <div class="value" id="updated">—</div>
+    </div>
+
+</div>
+
+<h2>Raw API Response</h2>
+
+<pre id="rawData">Loading...</pre>
+
+<script>
+    async function loadServerStats() {
+        const status = document.getElementById("status");
+
+        try {
+            const response = await fetch(
+                "https://api.shadowloafs.net/scpsl"
+            );
+
+            if (!response.ok) {
+                throw new Error(
+                    `API returned HTTP ${response.status}`
+                );
+            }
+
+            const result = await response.json();
+
+            console.log("Shadowloafs API response:", result);
+
+            // The backend now wraps the SCP:SL response
+            // inside a "data" property.
+            const data = result.data;
+
+            if (!data) {
+                throw new Error("API did not return SCP:SL data");
+            }
+
+            // Get the first server from the Servers array
+            const server = data.Servers?.[0];
+
+            if (!server) {
+                throw new Error("No SCP:SL servers were returned");
+            }
+
+            // API connection status
+            status.textContent = "API connection successful";
+            status.className = "online";
+
+            // Server information
+            document.getElementById("serverId").textContent =
+                server.ID;
+
+            document.getElementById("port").textContent =
+                server.Port;
+
+            document.getElementById("players").textContent =
+                server.Players;
+
+            // Use the timestamp from the backend
+            if (result.updated) {
+                document.getElementById("updated").textContent =
+                    new Date(result.updated).toLocaleTimeString();
+            } else {
+                document.getElementById("updated").textContent =
+                    "Unknown";
+            }
+
+            // Show complete response from our API
+            document.getElementById("rawData").textContent =
+                JSON.stringify(result, null, 2);
+
+            // If the backend encountered an upstream error,
+            // let us know while still displaying the last good data.
+            if (result.error) {
+                status.textContent =
+                    `Using cached data — ${result.error}`;
+
+                status.className = "warning";
+            }
+
+        } catch (error) {
+            console.error(
+                "Failed to load SCP:SL data:",
+                error
+            );
+
+            status.textContent =
+                `API error: ${error.message}`;
+
+            status.className = "offline";
+
+            document.getElementById("rawData").textContent =
+                error.toString();
+        }
+    }
+
+    loadServerStats();
+</script>
+
+</body>
+
+</html>
