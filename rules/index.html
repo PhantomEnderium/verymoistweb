@@ -13,7 +13,7 @@
   </p>
 
   <script>
-    fetch("https://shadowloafs.net/api/tvmpDesc")
+    fetch("https://api.shadowloafs.net/tvmpDesc")
     .then(r => r.text())
     .then(text => {
     document.getElementById("output").innerHTML = convertUnityRichText(text);
